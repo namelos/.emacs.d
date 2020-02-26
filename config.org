@@ -1,0 +1,137 @@
+* Navigation and movement
+#+BEGIN_SRC emacs-lisp
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(ido-mode 1)
+
+(windmove-default-keybindings)
+
+(defalias 'list-buffers 'ibuffer-other-window)
+#+END_SRC
+
+* Packages
+#+BEGIN_SRC emacs-lisp
+(use-package try
+  :ensure t)
+
+(use-package which-key
+  :ensure t
+  :config (which-key-mode))
+
+(use-package counsel
+  :ensure t
+  )
+
+(use-package swiper
+  :ensure t
+  :bind (("C-s" . swiper)
+	 ("C-r" . swiper))
+  :config
+  (progn
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq enable-recursive-minibuffers t)
+    ;; enable this if you want `swiper' to use it
+    ;; (setq search-default-mode #'char-fold-to-regexp)
+    (global-set-key (kbd "C-c C-r") 'ivy-resume)
+    (global-set-key (kbd "<f6>") 'ivy-resume)
+    (global-set-key (kbd "M-x") 'counsel-M-x)
+    (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+    (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+    (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+    (global-set-key (kbd "<f1> l") 'counsel-find-library)
+    (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+    (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+    (global-set-key (kbd "C-c g") 'counsel-git)
+    (global-set-key (kbd "C-c j") 'counsel-git-grep)
+    (global-set-key (kbd "C-c k") 'counsel-ag)
+    (global-set-key (kbd "C-x l") 'counsel-locate)
+    (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+    (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)    
+    ))
+
+(use-package avy
+  :ensure t
+  :bind ("M-s" . avy-goto-char))
+
+(use-package auto-complete
+  :ensure t
+  :init
+  (progn
+    (ac-config-default)
+    (global-auto-complete-mode t)
+    ))
+
+(use-package color-theme-modern
+  :ensure t)
+#+END_SRC
+
+* Turn off distractions
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-message t)
+
+(blink-cursor-mode 0)
+
+(setq initial-scratch-message "")
+(setq inhibit-startup-message t)
+
+(setq visible-bell t)
+
+(toggle-frame-fullscreen)
+(scroll-bar-mode 0)
+
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+#+END_SRC
+
+* White mode line
+#+BEGIN_SRC emacs-lisp
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(mode-line ((t (:background "white"))))
+ '(mode-line-highlight ((t nil)))
+ '(mode-line-inactive ((t (:background "white")))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["#2e3436" "#a40000" "#4e9a06" "#c4a000" "#204a87" "#5c3566" "#729fcf" "#eeeeec"])
+ '(package-selected-packages
+   (quote
+    (orgalist color-theme auto-complete counsel swiper ace-window which-key use-package try org-bullets))))
+#+END_SRC
+
+* Zen minor mode definition
+#+BEGIN_SRC emacs-lisp
+(defvar-local hidden-mode-line-mode nil)
+(defvar-local hide-mode-line nil)
+
+(define-minor-mode zen-mode
+  "Zen minor mode."
+  :init-value nil
+  :global t
+  :variable hidden-mode-line-mode
+  :group 'editing-basics
+  (if hidden-mode-line-mode
+      (setq hide-mode-line mode-line-format
+	    mode-line-format nil)
+    (setq mode-line-format hide-mode-line
+	  hide-mode-line nil))
+  (force-mode-line-update)
+
+  (redraw-display)
+
+  (when (and (called-interactively-p 'interactive)
+	     hidden-mode-line-mode)
+    (run-with-idle-timer
+     0 nil 'message
+     (concat "Zen Mode enabled. "
+	     "Use M-x zen-mode to make the mode-line appear."))))
+#+END_SRC
